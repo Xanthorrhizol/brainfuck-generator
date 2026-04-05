@@ -106,7 +106,6 @@ pub fn decode(s: &str) -> String {
         }
         loop_idx += 1;
     }
-    println!("{:?}", result);
     std::str::from_utf8(result.as_slice())
         .expect("invalid utf-8")
         .to_string()

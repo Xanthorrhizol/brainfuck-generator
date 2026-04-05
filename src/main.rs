@@ -25,25 +25,21 @@ impl std::str::FromStr for Opt {
 struct Args {
     config_path: PathBuf,
     option: Opt,
+    file_path: PathBuf,
 }
 
 fn main() {
     let Args {
         config_path,
         option,
+        file_path,
     } = Args::from_args();
     let config: Config = toml::from_str(&std::fs::read_to_string(&config_path).unwrap()).unwrap();
     println!("################## Brainfuck Generator ##################");
-    println!(
-        "Enter string to {}: ",
-        if option == Opt::Encode {
-            "encode"
-        } else {
-            "decode"
-        }
-    );
-    let read = std::io::stdin();
-    let mut s = read.lock().lines().next().unwrap().unwrap();
+    println!("{:?}", config);
+    println!("######################### Input #########################");
+    let mut s = std::fs::read_to_string(&file_path).unwrap();
+    println!("{}", s);
     println!("######################## Output #########################");
     if option == Opt::Encode {
         let mut encoded = std::str::from_utf8(&encode(&s))

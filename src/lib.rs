@@ -114,7 +114,7 @@ pub fn decode(s: &str) -> Vec<u8> {
             b'.' => {
                 result.push(tmp[idx]);
             }
-            _ => unreachable!(),
+            _ => {}
         }
         loop_idx += 1;
     }

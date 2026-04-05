@@ -1,0 +1,6 @@
+right = ">"
+left = "<"
+plus = "+"
+minus = "-"
+loop_start = "["
+loop_end = "]"

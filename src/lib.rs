@@ -15,10 +15,56 @@ pub struct Config {
 
 fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
     let mut result = Vec::new();
-    if is_referenced {
+    if c >= 64 {
+        if is_referenced {
+            result.push(b'<');
+            result.push(b'<');
+        }
+        let a = (c as f32).powf(1.0 / 3.0) as u8;
+        let b = c / a.pow(2);
+        let r = c % a.pow(2);
+
+        for _ in 0..a {
+            result.push(b'+');
+        }
+        result.push(b'[');
+        result.push(b'>');
+
+        for _ in 0..a {
+            result.push(b'+');
+        }
+        result.push(b'[');
+        result.push(b'>');
+
+        for _ in 0..b {
+            if is_minus {
+                result.push(b'-');
+            } else {
+                result.push(b'+');
+            }
+        }
         result.push(b'<');
-    }
-    if c > 10 {
+        result.push(b'-');
+        result.push(b']');
+
+        result.push(b'<');
+        result.push(b'-');
+        result.push(b']');
+
+        result.push(b'>');
+        result.push(b'>');
+
+        for _ in 0..r {
+            if is_minus {
+                result.push(b'-');
+            } else {
+                result.push(b'+');
+            }
+        }
+    } else if c > 10 {
+        if is_referenced {
+            result.push(b'<');
+        }
         let a = (c as f32).sqrt() as u8;
         let b = c / a;
         let r = c % a;
@@ -39,6 +85,7 @@ fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
         result.push(b'<');
         result.push(b'-');
         result.push(b']');
+
         result.push(b'>');
 
         for _ in 0..r {
@@ -49,7 +96,6 @@ fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
             }
         }
     } else {
-        result.push(b'>');
         for _ in 0..c {
             if is_minus {
                 result.push(b'-');
@@ -101,14 +147,17 @@ pub fn decode(s: &str) -> Vec<u8> {
             b'+' => tmp[idx] += 1,
             b'-' => tmp[idx] -= 1,
             b'[' => {
-                loop_stack.push(loop_idx);
                 if tmp[idx] == 0 {
-                    loop_idx = loop_stack.pop().unwrap();
+                    loop_stack.pop().unwrap();
+                } else {
+                    loop_stack.push(loop_idx);
                 }
             }
             b']' => {
                 if tmp[idx] != 0 {
                     loop_idx = *loop_stack.last().unwrap();
+                } else {
+                    loop_stack.pop().unwrap();
                 }
             }
             b'.' => {

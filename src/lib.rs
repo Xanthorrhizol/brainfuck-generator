@@ -13,57 +13,6 @@ pub struct Config {
     print: String,
 }
 
-fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
-    let mut result = Vec::new();
-    let depth = if c >= 64 {
-        3
-    } else if c >= 8 {
-        2
-    } else {
-        1
-    };
-    if is_referenced {
-        for _ in 0..depth - 1 {
-            result.push(b'<');
-        }
-    }
-    let a = (c as f32).powf(1.0 / depth as f32) as u8;
-    let b = c / a.pow(depth - 1);
-    let r = c % a.pow(depth - 1);
-    for _ in 0..depth - 1 {
-        for _ in 0..a {
-            result.push(b'+');
-        }
-        result.push(b'[');
-        result.push(b'>');
-    }
-    for _ in 0..b {
-        if is_minus {
-            result.push(b'-');
-        } else {
-            result.push(b'+');
-        }
-    }
-    for _ in 0..depth - 1 {
-        result.push(b'<');
-        result.push(b'-');
-        result.push(b']');
-    }
-    for _ in 0..depth - 1 {
-        result.push(b'>');
-    }
-    for _ in 0..r {
-        if is_minus {
-            result.push(b'-');
-        } else {
-            result.push(b'+');
-        }
-    }
-    result.push(b'.');
-
-    result
-}
-
 pub fn encode(s: &str) -> Vec<u8> {
     let mut result = Vec::new();
     let mut tmp = 0u8;
@@ -125,42 +74,6 @@ pub fn decode(s: &str) -> Vec<u8> {
     result
 }
 
-fn validate_config(config: &Config) -> Result<(), String> {
-    let Config {
-        plus,
-        minus,
-        right,
-        left,
-        loop_start,
-        loop_end,
-        print,
-    } = config;
-    if plus == minus
-        || plus == right
-        || plus == left
-        || plus == loop_start
-        || plus == loop_end
-        || minus == right
-        || minus == left
-        || minus == loop_start
-        || minus == loop_end
-        || right == left
-        || right == loop_start
-        || right == loop_end
-        || left == loop_start
-        || left == loop_end
-        || print == plus
-        || print == minus
-        || print == right
-        || print == left
-        || print == loop_start
-        || print == loop_end
-    {
-        return Err("invalid config".to_string());
-    }
-    Ok(())
-}
-
 pub fn swap_chars(s: &mut String, config: &Config) {
     validate_config(&config).expect("invalid config");
     let Config {
@@ -206,4 +119,91 @@ pub fn unswap_chars(s: &mut String, config: &Config) {
     for (x, y) in v {
         *s = s.replace(x, y);
     }
+}
+
+fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
+    let mut result = Vec::new();
+    let depth = if c >= 64 {
+        3
+    } else if c >= 8 {
+        2
+    } else {
+        1
+    };
+    if is_referenced {
+        for _ in 0..depth - 1 {
+            result.push(b'<');
+        }
+    }
+    let a = (c as f32).powf(1.0 / depth as f32) as u8;
+    let b = c / a.pow(depth - 1);
+    let r = c % a.pow(depth - 1);
+    for _ in 0..depth - 1 {
+        for _ in 0..a {
+            result.push(b'+');
+        }
+        result.push(b'[');
+        result.push(b'>');
+    }
+    for _ in 0..b {
+        if is_minus {
+            result.push(b'-');
+        } else {
+            result.push(b'+');
+        }
+    }
+    for _ in 0..depth - 1 {
+        result.push(b'<');
+        result.push(b'-');
+        result.push(b']');
+    }
+    for _ in 0..depth - 1 {
+        result.push(b'>');
+    }
+    for _ in 0..r {
+        if is_minus {
+            result.push(b'-');
+        } else {
+            result.push(b'+');
+        }
+    }
+    result.push(b'.');
+
+    result
+}
+
+fn validate_config(config: &Config) -> Result<(), String> {
+    let Config {
+        plus,
+        minus,
+        right,
+        left,
+        loop_start,
+        loop_end,
+        print,
+    } = config;
+    if plus == minus
+        || plus == right
+        || plus == left
+        || plus == loop_start
+        || plus == loop_end
+        || minus == right
+        || minus == left
+        || minus == loop_start
+        || minus == loop_end
+        || right == left
+        || right == loop_start
+        || right == loop_end
+        || left == loop_start
+        || left == loop_end
+        || print == plus
+        || print == minus
+        || print == right
+        || print == left
+        || print == loop_start
+        || print == loop_end
+    {
+        return Err("invalid config".to_string());
+    }
+    Ok(())
 }

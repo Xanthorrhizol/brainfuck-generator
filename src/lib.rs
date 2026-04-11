@@ -34,7 +34,8 @@ pub fn encode(b: &[u8]) -> Vec<u8> {
 pub fn decode(s: &str) -> Vec<u8> {
     let mut result = Vec::new();
     let mut tmp = Vec::new();
-    let mut idx = 0;
+    let mut idx = 1;
+    tmp.push(0);
     tmp.push(0);
     let mut loop_stack = Vec::new();
     let mut loop_idx = 0;
@@ -123,7 +124,11 @@ pub fn unswap_chars(s: &mut String, config: &Config) {
 
 fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
     let mut result = Vec::new();
-    let depth = (c as f32).powf(0.125) as u32 + 1;
+    let depth = if c < 8 {
+        1
+    } else {
+        (c as f32).powf(0.125) as u32 + 1
+    };
     if is_referenced {
         for _ in 0..depth - 1 {
             result.push(b'<');

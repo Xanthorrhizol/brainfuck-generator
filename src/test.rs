@@ -32,7 +32,7 @@ fn test() {
 
     println!("########## TEST 3 ##########");
 
-    let bytes = b"\x01\x08\x40\x60";
+    let bytes = b"\x00\x01\x08\x40\x60";
     println!("bytes: {:X?}", bytes);
     let bytes_encoded = std::str::from_utf8(&encode(bytes)).unwrap().to_string();
     println!("encode: {}", bytes_encoded);

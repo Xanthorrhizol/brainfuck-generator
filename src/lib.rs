@@ -123,13 +123,7 @@ pub fn unswap_chars(s: &mut String, config: &Config) {
 
 fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
     let mut result = Vec::new();
-    let depth = if c >= 64 {
-        3
-    } else if c >= 8 {
-        2
-    } else {
-        1
-    };
+    let depth = (c as f32).powf(0.125) as u32 + 1;
     if is_referenced {
         for _ in 0..depth - 1 {
             result.push(b'<');

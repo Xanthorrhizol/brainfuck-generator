@@ -15,93 +15,48 @@ pub struct Config {
 
 fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
     let mut result = Vec::new();
-    if c >= 64 {
-        if is_referenced {
-            result.push(b'<');
-            result.push(b'<');
-        }
-        let a = (c as f32).powf(1.0 / 3.0) as u8;
-        let b = c / a.pow(2);
-        let r = c % a.pow(2);
-
-        for _ in 0..a {
-            result.push(b'+');
-        }
-        result.push(b'[');
-        result.push(b'>');
-
-        for _ in 0..a {
-            result.push(b'+');
-        }
-        result.push(b'[');
-        result.push(b'>');
-
-        for _ in 0..b {
-            if is_minus {
-                result.push(b'-');
-            } else {
-                result.push(b'+');
-            }
-        }
-        result.push(b'<');
-        result.push(b'-');
-        result.push(b']');
-
-        result.push(b'<');
-        result.push(b'-');
-        result.push(b']');
-
-        result.push(b'>');
-        result.push(b'>');
-
-        for _ in 0..r {
-            if is_minus {
-                result.push(b'-');
-            } else {
-                result.push(b'+');
-            }
-        }
-    } else if c > 10 {
-        if is_referenced {
-            result.push(b'<');
-        }
-        let a = (c as f32).sqrt() as u8;
-        let b = c / a;
-        let r = c % a;
-
-        for _ in 0..a {
-            result.push(b'+');
-        }
-        result.push(b'[');
-        result.push(b'>');
-
-        for _ in 0..b {
-            if is_minus {
-                result.push(b'-');
-            } else {
-                result.push(b'+');
-            }
-        }
-        result.push(b'<');
-        result.push(b'-');
-        result.push(b']');
-
-        result.push(b'>');
-
-        for _ in 0..r {
-            if is_minus {
-                result.push(b'-');
-            } else {
-                result.push(b'+');
-            }
-        }
+    let depth = if c >= 64 {
+        3
+    } else if c >= 8 {
+        2
     } else {
-        for _ in 0..c {
-            if is_minus {
-                result.push(b'-');
-            } else {
-                result.push(b'+');
-            }
+        1
+    };
+    if is_referenced {
+        for _ in 0..depth - 1 {
+            result.push(b'<');
+        }
+    }
+    let a = (c as f32).powf(1.0 / depth as f32) as u8;
+    let b = c / a.pow(depth - 1);
+    let r = c % a.pow(depth - 1);
+    for _ in 0..depth - 1 {
+        for _ in 0..a {
+            result.push(b'+');
+        }
+        result.push(b'[');
+        result.push(b'>');
+    }
+    for _ in 0..b {
+        if is_minus {
+            result.push(b'-');
+        } else {
+            result.push(b'+');
+        }
+    }
+    for _ in 0..depth - 1 {
+        result.push(b'<');
+        result.push(b'-');
+        result.push(b']');
+    }
+    for _ in 0..depth - 1 {
+        result.push(b'>');
+    }
+    for _ in 0..r {
+        if is_minus {
+            result.push(b'-');
+        } else {
+            result.push(b'+');
         }
     }
     result.push(b'.');

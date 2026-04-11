@@ -38,8 +38,12 @@ fn main() {
     println!("################## Brainfuck Generator ##################");
     println!("{:?}", config);
     println!("######################### Input #########################");
-    let mut s = std::fs::read_to_string(&file_path).unwrap();
-    println!("{}", s);
+    let s = std::fs::read(&file_path).unwrap();
+    if let Ok(s) = std::str::from_utf8(&s) {
+        println!("{}", s);
+    } else {
+        println!("{:?}", s);
+    }
     println!("######################## Output #########################");
     if option == Opt::Encode {
         let mut encoded = std::str::from_utf8(&encode(&s))
@@ -48,10 +52,15 @@ fn main() {
         swap_chars(&mut encoded, &config);
         println!("{}", encoded);
     } else {
-        unswap_chars(&mut s, &config);
-        println!(
-            "{}",
-            std::str::from_utf8(&decode(&s)).expect("decode failed")
-        );
+        if let Ok(s) = std::str::from_utf8(&s) {
+            let mut s = s.to_string();
+            unswap_chars(&mut s, &config);
+            println!(
+                "{}",
+                std::str::from_utf8(&decode(&s)).expect("decode failed")
+            );
+        } else {
+            eprintln!("decode failed");
+        }
     }
 }

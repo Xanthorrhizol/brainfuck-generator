@@ -13,11 +13,11 @@ pub struct Config {
     print: String,
 }
 
-pub fn encode(s: &str) -> Vec<u8> {
+pub fn encode(b: &[u8]) -> Vec<u8> {
     let mut result = Vec::new();
     let mut tmp = 0u8;
     let mut is_first = true;
-    for c in s.as_bytes() {
+    for c in b {
         result.extend(&encode_char(
             if *c > tmp { *c - tmp } else { tmp - *c },
             *c < tmp,

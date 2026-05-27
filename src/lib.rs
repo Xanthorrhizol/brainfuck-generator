@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod test;
 use serde::Deserialize;
+use std::io::Read;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -41,35 +42,14 @@ pub fn decode(s: &str) -> Vec<u8> {
     let mut loop_idx = 0;
     while loop_idx < s.len() {
         let c = s.as_bytes()[loop_idx];
-        match c {
-            b'>' => {
-                idx += 1;
-                if idx >= tmp.len() {
-                    tmp.push(0);
-                }
-            }
-            b'<' => idx -= 1,
-            b'+' => tmp[idx] += 1,
-            b'-' => tmp[idx] -= 1,
-            b'[' => {
-                if tmp[idx] == 0 {
-                    loop_stack.pop().unwrap();
-                } else {
-                    loop_stack.push(loop_idx);
-                }
-            }
-            b']' => {
-                if tmp[idx] != 0 {
-                    loop_idx = *loop_stack.last().unwrap();
-                } else {
-                    loop_stack.pop().unwrap();
-                }
-            }
-            b'.' => {
-                result.push(tmp[idx]);
-            }
-            _ => {}
-        }
+        decode_charcode(
+            c,
+            &mut tmp,
+            &mut idx,
+            &mut loop_stack,
+            &mut loop_idx,
+            &mut result,
+        );
         loop_idx += 1;
     }
     result
@@ -171,6 +151,50 @@ fn encode_char(c: u8, is_minus: bool, is_referenced: bool) -> Vec<u8> {
     result
 }
 
+fn decode_charcode(
+    c: u8,
+    tmp: &mut Vec<u8>,
+    idx: &mut usize,
+    loop_stack: &mut Vec<usize>,
+    loop_idx: &mut usize,
+    result: &mut Vec<u8>,
+) {
+    match c {
+        b'>' => {
+            *idx += 1;
+            if *idx >= tmp.len() {
+                tmp.push(0);
+            }
+        }
+        b'<' => *idx -= 1,
+        b'+' => tmp[*idx] += 1,
+        b'-' => tmp[*idx] -= 1,
+        b'[' => {
+            if tmp[*idx] == 0 {
+                loop_stack.pop().unwrap();
+            } else {
+                loop_stack.push(*loop_idx);
+            }
+        }
+        b']' => {
+            if tmp[*idx] != 0 {
+                *loop_idx = *loop_stack.last().unwrap();
+            } else {
+                loop_stack.pop().unwrap();
+            }
+        }
+        b'.' => {
+            result.push(tmp[*idx]);
+        }
+        b',' => {
+            println!("Insert a character");
+            let c = read_one_byte();
+            tmp[*idx] = c;
+        }
+        _ => {}
+    }
+}
+
 fn validate_config(config: &Config) -> Result<(), String> {
     let Config {
         plus,
@@ -205,4 +229,17 @@ fn validate_config(config: &Config) -> Result<(), String> {
         return Err("invalid config".to_string());
     }
     Ok(())
+}
+
+fn read_one_byte() -> u8 {
+    let fd = 0; // stdin
+    let mut old = unsafe { std::mem::zeroed::<libc::termios>() };
+    unsafe { libc::tcgetattr(fd, &mut old) };
+    let mut raw = old;
+    raw.c_lflag &= !(libc::ICANON | libc::ECHO);
+    unsafe { libc::tcsetattr(fd, libc::TCSANOW, &raw) };
+    let mut buf = [0u8; 1];
+    std::io::stdin().read_exact(&mut buf).unwrap();
+    unsafe { libc::tcsetattr(fd, libc::TCSANOW, &old) };
+    buf[0]
 }

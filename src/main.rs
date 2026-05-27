@@ -1,6 +1,5 @@
 use brainfuck_generator::*;
 use serde::Deserialize;
-use std::io::BufRead;
 use std::path::PathBuf;
 use structopt::StructOpt;
 

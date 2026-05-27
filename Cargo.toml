@@ -1,6 +1,6 @@
 [package]
 name = "brainfuck-generator"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 authors = [ "Xanthorrhizol <xanthorrhizol@proton.me>" ]
 description = "Akka actor"
@@ -10,7 +10,6 @@ license = "MIT"
 keywords = ["brainfuck", "syusuk"]
 
 [dependencies]
-libc = "0.2.186"
 serde = { version = "1.0.228", features = ["derive"] }
 structopt = "0.3.26"
 toml = "1.1.2"

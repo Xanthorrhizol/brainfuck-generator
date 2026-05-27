@@ -232,14 +232,7 @@ fn validate_config(config: &Config) -> Result<(), String> {
 }
 
 fn read_one_byte() -> u8 {
-    let fd = 0; // stdin
-    let mut old = unsafe { std::mem::zeroed::<libc::termios>() };
-    unsafe { libc::tcgetattr(fd, &mut old) };
-    let mut raw = old;
-    raw.c_lflag &= !(libc::ICANON | libc::ECHO);
-    unsafe { libc::tcsetattr(fd, libc::TCSANOW, &raw) };
-    let mut buf = [0u8; 1];
-    std::io::stdin().read_exact(&mut buf).unwrap();
-    unsafe { libc::tcsetattr(fd, libc::TCSANOW, &old) };
+    let mut buf = [0u8; 8];
+    std::io::stdin().read(&mut buf).unwrap();
     buf[0]
 }

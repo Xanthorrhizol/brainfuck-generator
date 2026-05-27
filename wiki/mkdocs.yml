@@ -1,4 +1,5 @@
 site_name: Brainfuck Generator
+site_url: https://xanthorrhizol.github.io/brainfuck-generator/
 theme:
   name: material
   language: en

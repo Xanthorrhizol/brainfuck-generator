@@ -12,6 +12,7 @@ pub struct Config {
     loop_start: String,
     loop_end: String,
     print: String,
+    stdin: String,
 }
 
 pub fn encode(b: &[u8]) -> Vec<u8> {
@@ -65,14 +66,16 @@ pub fn swap_chars(s: &mut String, config: &Config) {
         loop_start,
         loop_end,
         print,
+        stdin,
     } = config;
+    *s = s.replace(".", print);
+    *s = s.replace(",", stdin);
     *s = s.replace("+", plus);
     *s = s.replace("-", minus);
     *s = s.replace(">", right);
     *s = s.replace("<", left);
     *s = s.replace("[", loop_start);
     *s = s.replace("]", loop_end);
-    *s = s.replace(".", print);
 }
 
 pub fn unswap_chars(s: &mut String, config: &Config) {
@@ -85,6 +88,7 @@ pub fn unswap_chars(s: &mut String, config: &Config) {
         loop_start,
         loop_end,
         print,
+        stdin,
     } = config;
     let mut v = Vec::new();
     v.push((plus, "+"));
@@ -94,6 +98,7 @@ pub fn unswap_chars(s: &mut String, config: &Config) {
     v.push((loop_start, "["));
     v.push((loop_end, "]"));
     v.push((print, "."));
+    v.push((stdin, ","));
 
     v.sort_by_key(|(x, _)| x.len());
     v.reverse();
@@ -204,6 +209,7 @@ fn validate_config(config: &Config) -> Result<(), String> {
         loop_start,
         loop_end,
         print,
+        stdin,
     } = config;
     if plus == minus
         || plus == right
@@ -225,6 +231,12 @@ fn validate_config(config: &Config) -> Result<(), String> {
         || print == left
         || print == loop_start
         || print == loop_end
+        || stdin == plus
+        || stdin == minus
+        || stdin == right
+        || stdin == left
+        || stdin == loop_start
+        || stdin == loop_end
     {
         return Err("invalid config".to_string());
     }

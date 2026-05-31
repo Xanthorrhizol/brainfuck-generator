@@ -13,6 +13,9 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 
+markdown_extensions:
+  - admonition
+
 plugins:
   - search
   - i18n:
@@ -32,3 +35,4 @@ nav:
   - config.md
   - api.md
   - encoding.md
+  - Try it online ↗: https://xanthorrhizol.github.io

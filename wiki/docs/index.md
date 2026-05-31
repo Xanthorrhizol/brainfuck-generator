@@ -1,5 +1,8 @@
 # Introduction
 
+!!! tip "Try it online"
+    Want to try it right away without installing anything? Use the web version at **[xanthorrhizol.github.io](https://xanthorrhizol.github.io)**.
+
 Brainfuck Generator is a Rust library that encodes text into [brainfuck](https://en.wikipedia.org/wiki/Brainfuck) code and decodes brainfuck code back into text.
 
 ## Features

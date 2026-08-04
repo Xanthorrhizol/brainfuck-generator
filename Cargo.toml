@@ -1,10 +1,10 @@
 [package]
 name = "brainfuck-generator"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 authors = [ "Xanthorrhizol <xanthorrhizol@proton.me>" ]
-description = "Akka actor"
-repository = "https://github.com/Xanthorrhizol/actor"
+description = "Brainfuck generator"
+repository = "https://github.com/Xanthorrhizol/brainfuck-generator"
 readme = "README.md"
 license = "MIT"
 keywords = ["brainfuck", "syusuk"]
